@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById("latitude").value = position.coords.latitude;
+                    document.getElementById("longitude").value = position.coords.longitude;
+                },
+                    function(error) {
+                    console.log("Geolocation error:", error);
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
+            }
+        }
+        window.onload = getLocation; // ✅ Auto-run on page load
+    </script>
+</head>
+<body>
+    <h2>Register</h2>
+
+    <!-- ✅ Show Success and Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">
+                {{ message }}
+            </p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- ✅ Show form errors if any -->
+        {% if user_form.errors or profile_form.errors %}
+            <p style="color: red;">There were errors in your submission. Please fix them below.</p>
+        {% endif %}
+
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</body>
+</html>

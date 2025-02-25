@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Blog Post</title>
+</head>
+<body>
+    <h2>Create a Blog Post</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Publish</button>
+    </form>
+    <a href="{% url 'blog_list' %}">Cancel</a>
+    <a href="{% url 'dashboard' %}" class="button">🏠 Back to Dashboard</a>
+    <a href="{% url 'profile' request.user.username %}" class="button">👤 Back to Profile</a>
+</body>
+</html>

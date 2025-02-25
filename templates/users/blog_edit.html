@@ -1,0 +1,9 @@
+<a href="{% url 'dashboard' %}" class="button">🏠 Back to Dashboard</a>
+<a href="{% url 'profile' request.user.username %}" class="button">👤 Back to Profile</a>
+
+<h2>Edit Blog Post</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💾 Save Changes</button>
+</form>

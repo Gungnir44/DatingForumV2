@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            max-width: 600px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Welcome, {{ user.username }}</h2>
+
+    <p>Use the buttons below to navigate:</p>
+
+    <a href="{% url 'profile' user.username %}">View Profile</a>
+    <a href="{% url 'inbox' %}" class="button">Messages</a>
+    <a href="{% url 'search_users' %}" class="button">Find Users</a>
+    <a href="{% url 'notifications_list' %}">Notifications</a>
+    <a href="{% url 'logout' %}" class="button" style="background-color: red;">Log Out</a>
+
+    <h3>Recent Blog Posts</h3>
+
+    {% if blogs %}
+        <ul>
+            {% for blog in blogs %}
+                <li>
+                    <a href="{% url 'blog_detail' blog.id %}">{{ blog.title }}</a>
+                    by <a href="{% url 'profile' blog.author.username %}">{{ blog.author.username }}</a>
+                    - {{ blog.created_at|date:"M d, Y" }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No blog posts available.</p>
+    {% endif %}
+    <a href="{% url 'blog_list' %}">View All Blogs</a>
+    <a href="{% url 'blog_create' %}">Write a New Blog</a>
+
+
+</body>
+</html>

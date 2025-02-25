@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ blog.title }}</title>
+</head>
+<body>
+    <a href="{% url 'dashboard' %}" class="button">🏠 Back to Dashboard</a>
+    <a href="{% url 'profile' blog.author.username %}" class="button">👤 Back to {{ blog.author.username }}'s Profile</a>
+
+    <h2>{{ blog.title }}</h2>
+    <p>By <a href="{% url 'profile' blog.author.username %}">{{ blog.author.username }}</a>
+       on {{ blog.created_at|date:"M d, Y" }}</p>
+
+    {% if blog.image %}
+        <img src="{{ blog.image.url }}" alt="Blog Image" width="300">
+    {% endif %}
+
+    <p>{{ blog.content }}</p>
+    <a href="{% url 'blog_list' %}">Back to All Blogs</a>
+
+    {% if request.user == blog.author %}
+        <a href="{% url 'blog_edit' blog.id %}" class="button">✏️ Edit Blog</a>
+        <a href="{% url 'blog_delete' blog.id %}" class="button">🗑 Delete Blog</a>
+    {% endif %}
+
+</body>
+</html>

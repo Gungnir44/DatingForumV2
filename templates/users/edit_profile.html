@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            max-width: 600px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .profile-pic {
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+    </style>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById("id_latitude").value = position.coords.latitude;
+                        document.getElementById("id_longitude").value = position.coords.longitude;
+                    },
+                    function(error) {
+                        console.error("Geolocation error:", error);
+                        alert("Failed to get location. Please allow location access.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        window.onload = function() {
+            getLocation(); // ✅ Automatically fetch location when page loads
+        };
+    </script>
+
+</head>
+<body>
+    <h2>Edit Profile</h2>
+
+    <form method="POST" enctype="multipart/form-data">  <!-- ✅ Allows image upload -->
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="id_profile_picture">Profile Picture:</label>
+            {{ form.profile_picture }}
+        </div>
+
+        {% if form.instance.profile_picture %}
+            <p>Current Picture:</p>
+            <img class="profile-pic" src="{{ form.instance.profile_picture.url }}" alt="Profile Picture" width="150">
+        {% endif %}
+
+        <div class="form-group">
+            <label for="id_age">Age:</label>
+            {{ form.age }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_gender">Gender:</label>
+            {{ form.gender }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_height">Height:</label>
+            {{ form.height }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_career">Career:</label>
+            {{ form.career }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_income">Income ($):</label>
+            {{ form.income }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_contact_info">Contact Info:</label>
+            {{ form.contact_info }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_profile_visibility">Privacy Settings:</label>
+            {{ form.profile_visibility }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_message_privacy">Message Privacy:</label>
+            {{ form.message_privacy }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_location">Location (Geolocation):</label>
+            <input type="hidden" id="id_latitude" name="latitude" value="{{ form.instance.latitude }}">
+            <input type="hidden" id="id_longitude" name="longitude" value="{{ form.instance.longitude }}">
+        </div>
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <br>
+    <a href="{% url 'profile' username=request.user.username %}">Back to Profile</a>
+
+    <a href="{% url 'profile' username=request.user.username %}">Cancel</a>
+</body>
+</html>

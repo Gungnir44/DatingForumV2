@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts</title>
+</head>
+<body>
+    <h2>All Blog Posts</h2>
+    <a href="{% url 'blog_create' %}">Create a New Blog Post</a>
+    <a href="{% url 'dashboard' %}" class="button">🏠 Back to Dashboard</a>
+
+    {% for blog in blogs %}
+        <div>
+            <h3><a href="{% url 'blog_detail' blog.id %}">{{ blog.title }}</a></h3>
+            <p>By {{ blog.author.username }} | {{ blog.created_at }}</p>
+            {% if blog.image %}
+                <img src="{{ blog.image.url }}" alt="Blog Image" width="200">
+            {% endif %}
+            <p>{{ blog.content|truncatewords:30 }}</p>
+            <hr>
+        </div>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Sent Messages</h2>
+{% for message in messages_sent %}
+    <div>
+        <strong>To:</strong> {{ message.receiver.username }} <br>
+        <strong>Subject:</strong> <a href="{% url 'view_message' message.id %}">{{ message.subject }}</a> <br>
+        <strong>Date:</strong> {{ message.timestamp }} <br>
+        <hr>
+    </div>
+{% empty %}
+    <p>No sent messages.</p>
+{% endfor %}
+{% endblock %}

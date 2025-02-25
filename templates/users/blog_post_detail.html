@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+</head>
+<body>
+    <h2>{{ post.title }}</h2>
+    <p>By: {{ post.author.username }}</p>
+    <p>{{ post.content }}</p>
+    <hr>
+
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <strong>{{ comment.user.username }}:</strong> {{ comment.content }} <br>
+                <small>{{ comment.timestamp }}</small>
+                {% if request.user == comment.user or request.user.is_staff %}
+                    <a href="{% url 'delete_comment' comment.id %}">Delete</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No comments yet. Be the first to comment!</p>
+        {% endfor %}
+    </ul>
+
+    {% if request.user.is_authenticated %}
+        <h3>Leave a Comment</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Post Comment</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Log in</a> to post a comment.</p>
+    {% endif %}
+
+    <a href="/">Back to Blog</a>
+</body>
+</html>

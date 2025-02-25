@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            padding: 20px;
+            max-width: 600px;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .info {
+            margin-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Welcome, {{ user.username }}</h2>
+
+    {% if user_profile.profile_picture %}
+        <img class="profile-pic" src="{{ user_profile.profile_picture.url }}" alt="Profile Picture">
+    {% else %}
+        <p>No profile picture uploaded.</p>
+    {% endif %}
+
+    <div class="info"><strong>Age:</strong> {{ user_profile.age|default:"Not set" }}</div>
+    <div class="info"><strong>Gender:</strong> {{ user_profile.gender|default:"Not set" }}</div>
+    <div class="info"><strong>Height:</strong> {{ user_profile.height|default:"Not set" }}</div>
+    <div class="info"><strong>Career:</strong> {{ user_profile.career|default:"Not set" }}</div>
+    <div class="info"><strong>Income:</strong> ${{ user_profile.income|default:"Not set" }}</div>
+    <div class="info"><strong>Contact Info:</strong> {{ user_profile.contact_info|default:"Not set" }}</div>
+
+    <!-- Like Button -->
+    <button class="btn" id="like-btn" data-user-id="{{ user.id }}">
+        {% if request.user in user.likes_received.all %}
+            Unlike
+        {% else %}
+            Like
+        {% endif %}
+    </button>
+
+    <!-- Friend Request Button -->
+    <button class="btn" id="friend-btn" data-user-id="{{ user.id }}">
+        {% if request.user in user.received_requests.all %}
+            Friend Request Sent
+        {% else %}
+            Send Friend Request
+        {% endif %}
+    </button>
+
+    <!-- Friend Requests Section -->
+    {% if friend_requests %}
+        <h3>Friend Requests</h3>
+        <ul>
+            {% for request in friend_requests %}
+                <li>
+                    {{ request.sender.username }}
+                    <button class="btn accept-btn" data-request-id="{{ request.id }}">Accept</button>
+                    <button class="btn reject-btn" data-request-id="{{ request.id }}">Reject</button>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Friends List -->
+    {% if friends %}
+        <h3>Friends</h3>
+        <ul>
+            {% for friend in friends %}
+                <li>{{ friend.username }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <a href="{% url 'edit_profile' %}" class="btn">Edit Profile</a>
+
+    <div class="nav-buttons">
+        <a href="{% url 'edit_profile' %}">Edit Profile</a>
+        <a href="{% url 'inbox' %}" class="button">Inbox</a>
+        <a href="{% url 'search_users' %}" class="button">Search Users</a>
+        <a href="{% url 'dashboard' %}" class="button">Dashboard</a>
+        <a href="{% url 'logout' %}" class="button" style="background-color: red;">Log Out</a>
+    </div>
+
+    <h3>{{ user_profile.user.username }}'s Blog Posts</h3>
+
+    {% if user_profile.user.blogpost_set.all %}
+        <ul>
+            {% for blog in user_profile.user.blogpost_set.all %}
+                <li>
+                    <a href="{% url 'blog_detail' blog.id %}">{{ blog.title }}</a>
+                    - {{ blog.created_at|date:"M d, Y" }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No blog posts yet.</p>
+    {% endif %}
+
+
+    <script>
+    document.getElementById('like-btn').addEventListener('click', function () {
+        const userId = this.getAttribute('data-user-id');
+        fetch(`/users/like/${userId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'liked') {
+                alert('You liked this user!');
+            } else if (data.status === 'unliked') {
+                alert('You unliked this user.');
+            } else if (data.status === 'match') {
+                alert('It’s a match! You both liked each other.');
+            }
+        });
+    });
+
+    document.getElementById('friend-btn').addEventListener('click', function () {
+        const userId = this.getAttribute('data-user-id');
+        fetch(`/users/friend-request/${userId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'sent') {
+                alert('Friend request sent!');
+            } else if (data.status === 'already_sent') {
+                alert('You already sent a request.');
+            }
+        });
+    });
+
+    document.querySelectorAll('.accept-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const requestId = this.getAttribute('data-request-id');
+            fetch(`/users/accept-request/${requestId}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'accepted') {
+                    alert('Friend request accepted!');
+                    location.reload();
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.reject-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const requestId = this.getAttribute('data-request-id');
+            fetch(`/users/reject-request/${requestId}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'rejected') {
+                    alert('Friend request rejected.');
+                    location.reload();
+                }
+            });
+        });
+    });
+    </script>
+
+</body>
+</html>
