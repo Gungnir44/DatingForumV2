@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 LOGIN_URL = 'login'
 
 # Google API Key for Geolocation
-GOOGLE_MAPS_API_KEY = "AIzaSyBBvzcC0pab6xavlEiXuX6xIDV9ndWtmbA"
+GOOGLE_MAPS_API_KEY = "enter api key here"
 
 # Application definition
 
